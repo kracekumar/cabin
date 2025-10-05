@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unix Timestamp Converter</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+        }
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 600px;
+            margin-top: 2rem;
+        }
+        h1 {
+            text-align: center;
+            color: #0056b3;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        button {
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background-color: #28a745;
+            color: white;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        .result {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #e9ecef;
+            border-radius: 6px;
+            word-wrap: break-word;
+        }
+        .result p {
+            margin: 0.5rem 0;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Date Time Converter</h1>
+        <div class="form-group">
+            <label for="converter-input">Enter Timestamp or Date String</label>
+            <input type="text" id="converter-input" placeholder="e.g., 1672531200 or 2023-01-01">
+        </div>
+        <button id="convert-btn">Convert</button>
+        <div id="results" class="result" style="display: none;">
+            <p><strong>Input:</strong> <span id="input-value"></span></p>
+            <p><strong>UTC:</strong> <span id="utc-time"></span></p>
+            <p><strong>Dublin:</strong> <span id="dublin-time"></span></p>
+            <p><strong>Unix Timestamp:</strong> <span id="unix-timestamp"></span></p>
+        </div>
+    </div>
+
+    <script>
+        const convertBtn = document.getElementById('convert-btn');
+        const converterInput = document.getElementById('converter-input');
+        const resultsDiv = document.getElementById('results');
+        
+        const inputValueSpan = document.getElementById('input-value');
+        const utcTimeSpan = document.getElementById('utc-time');
+        const dublinTimeSpan = document.getElementById('dublin-time');
+        const unixTimestampSpan = document.getElementById('unix-timestamp');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentTimestamp = Math.floor(Date.now() / 1000);
+            converterInput.value = currentTimestamp;
+        });
+
+        convertBtn.addEventListener('click', () => {
+            const input = converterInput.value.trim();
+            if (!input) {
+                alert('Please enter a value.');
+                return;
+            }
+
+            let date;
+            const isNumeric = /^-?\d+$/.test(input);
+
+            if (isNumeric) {
+                // Input is likely a Unix timestamp. Treat as seconds.
+                date = new Date(parseInt(input, 10) * 1000);
+            } else {
+                // Input is likely a date string.
+                date = new Date(input);
+            }
+
+            if (isNaN(date.getTime())) {
+                alert('Invalid date or timestamp format. Please try again.');
+                resultsDiv.style.display = 'none';
+                return;
+            }
+
+            // --- Calculations ---
+            const unixTimestamp = Math.floor(date.getTime() / 1000);
+            const utcString = date.toUTCString();
+            const dublinOptions = { timeZone: 'Europe/Dublin', hour12: false, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const dublinString = new Intl.DateTimeFormat('en-GB', dublinOptions).format(date);
+
+            // --- Display Results ---
+            inputValueSpan.textContent = input;
+            utcTimeSpan.textContent = utcString;
+            dublinTimeSpan.textContent = dublinString;
+            unixTimestampSpan.textContent = unixTimestamp;
+
+            resultsDiv.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
